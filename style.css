@@ -32,3 +32,8 @@ dialog{border:0;padding:0;max-width:900px;width:90vw;max-height:90vh;color:#1515
 
 /* Supplied brand artwork, framed without the excess image margins. */
 .brand .logo-window,.footer-brand .logo-window{position:relative;display:block;width:240px;height:64px;overflow:hidden;margin:0;background:#232320;border-radius:3px}.logo-window img{position:absolute;width:360px;height:360px;max-width:none;left:50%;top:50%;transform:translate(-50%,-50%)}.logo-monogram{position:relative!important;display:block;width:58px;height:58px;overflow:hidden;background:#232320}.logo-monogram img{position:absolute;width:300px;max-width:none;left:50%;top:50%;transform:translate(-50%,-50%)}@media(max-width:850px){header .brand .logo-window{width:170px;height:54px}header .logo-window img{width:260px;height:260px}}@media(max-width:600px){header .brand .logo-window{width:156px;height:50px}header .logo-window img{width:240px;height:240px}}
+
+/* Transparent wordmark, preserving its original artwork. */
+.brand .logo-window,.footer-brand .logo-window{background:transparent;border-radius:0}.logo-window img{width:270px;height:auto;top:50%;left:50%;transform:translate(-50%,-50%)}.menu-top .brand .logo-window{width:220px;height:64px}.menu-top .logo-window img{width:245px}@media(max-width:850px){header .logo-window img{width:195px;height:auto}}@media(max-width:600px){header .logo-window img{width:180px;height:auto}}
+
+.story>img{object-fit:cover;object-position:center}
