@@ -76,3 +76,5 @@ header,.collection{border-color:#ffffff26}.footer-bottom,.card-views{border-colo
 
 /* Fit the full wordmark inside its mobile frame without clipping. */
 @media(max-width:600px){header .brand .logo-window{width:clamp(125px,37vw,156px);max-width:none;height:54px}header .logo-window img{width:100%;height:auto;max-width:100%;left:50%;top:50%;transform:translate(-50%,-50%)}}
+
+@media(max-width:600px){.drop-countdown>.campaign-image{margin:28px 0 0}.drop-countdown>.slide-controls{padding:16px 0 24px}.drop-countdown>.hero-price{margin-bottom:24px}}

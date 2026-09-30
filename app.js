@@ -26,3 +26,16 @@ function updateCountdown(){const t=getDropTime(Date.now());for(const unit of ['d
 let countdownTimer=setInterval(updateCountdown,1000);updateCountdown();
 
 document.querySelector('#heroPhoto').onclick=()=>openProduct(products[activeSlide].id);
+
+// On phones, show the pants before the price and launch details.
+const mobileLayout=window.matchMedia('(max-width:600px)');
+const campaignPhoto=document.querySelector('.campaign-image');
+const colourControls=document.querySelector('.slide-controls');
+const desktopPhotoPosition=document.createComment('Desktop photo position');
+campaignPhoto.before(desktopPhotoPosition);
+function arrangeMobileProduct(){
+ if(mobileLayout.matches){document.querySelector('.hero-price').before(campaignPhoto,colourControls)}
+ else{desktopPhotoPosition.after(campaignPhoto,colourControls)}
+}
+mobileLayout.addEventListener('change',arrangeMobileProduct);
+arrangeMobileProduct();
