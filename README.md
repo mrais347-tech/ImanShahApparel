@@ -19,6 +19,6 @@ The launch target is 2026-10-02T20:00:00+08:00 (October 2, 2026, 8pm Malaysia ti
 
 ## Current limitations
 
-Checkout and payments are disabled. All three colourways (Black, Maroon and Blue) are RM89 per pair. Sizes are provisional. The demo bag resets on reload. TikTok playback depends on TikTok availability and browser restrictions. Generated campaign posters are used alongside original product photographs.
+Checkout and payments are disabled. All three colourways (Black, Maroon and Blue) are RM89 per pair. All trousers are Free Size; no size selection is required. The demo bag resets on reload. TikTok playback depends on TikTok availability and browser restrictions. Generated campaign posters are used alongside original product photographs.
 
 This archive contains the current v8 storefront exported from source commit b5fda804aaadfff0e644343286cbe980eb2ce45e. It excludes repository history, credentials, and Sites hosting metadata.
