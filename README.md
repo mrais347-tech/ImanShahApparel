@@ -15,10 +15,10 @@ If updating an existing project, use the existing repository and preserve its .g
 - app.js: products, galleries, demo bag, colour switching and countdown
 - assets/: supplied product posters and original product photos
 
-The launch target is 2026-10-07T00:00:00+08:00 (October 7, 2026, midnight Malaysia time), configured as dropAt in app.js. After the countdown ends, it stays at zero and shows a check-back message; it does not automatically enable purchasing.
+The launch target is 2026-10-02T20:00:00+08:00 (October 2, 2026, 8pm Malaysia time), configured as dropAt in app.js. After the countdown ends, it stays at zero and shows a check-back message; it does not automatically enable purchasing.
 
 ## Current limitations
 
-Checkout and payments are disabled. Prices are unconfirmed. Sizes are provisional. The demo bag resets on reload. TikTok playback depends on TikTok availability and browser restrictions. Generated campaign posters are used alongside original product photographs.
+Checkout and payments are disabled. All three colourways (Black, Maroon and Blue) are RM89 per pair. Sizes are provisional. The demo bag resets on reload. TikTok playback depends on TikTok availability and browser restrictions. Generated campaign posters are used alongside original product photographs.
 
 This archive contains the current v8 storefront exported from source commit b5fda804aaadfff0e644343286cbe980eb2ce45e. It excludes repository history, credentials, and Sites hosting metadata.
