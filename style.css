@@ -70,3 +70,6 @@ header,.collection{border-color:#ffffff26}.footer-bottom,.card-views{border-colo
 .main-nav{gap:20px}.countdown{max-width:500px}
 @media(max-width:1050px) and (min-width:601px){header .main-nav{gap:12px;font-size:13px}header .header-right>span{display:none}}
 @media(max-width:600px){.countdown{gap:8px}.countdown span{letter-spacing:0}.brand .logo-window{max-width:145px}.bag{font-size:15px}.product-summary{min-width:0}}
+
+/* Small, unlinked creator credit. */
+.maker-credit{margin:18px 0 0;text-align:right;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.5;color:#a39e96}.maker-credit strong{font-weight:700;color:#d7d1c8}
