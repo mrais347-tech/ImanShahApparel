@@ -73,3 +73,6 @@ header,.collection{border-color:#ffffff26}.footer-bottom,.card-views{border-colo
 
 /* Small, unlinked creator credit. */
 .maker-credit{margin:18px 0 0;text-align:right;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.5;color:#a39e96}.maker-credit strong{font-weight:700;color:#d7d1c8}
+
+/* Fit the full wordmark inside its mobile frame without clipping. */
+@media(max-width:600px){header .brand .logo-window{width:clamp(125px,37vw,156px);max-width:none;height:54px}header .logo-window img{width:100%;height:auto;max-width:100%;left:50%;top:50%;transform:translate(-50%,-50%)}}
