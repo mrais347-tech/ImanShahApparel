@@ -7,7 +7,7 @@ http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(url.pathname.startsWith('/api/')){
   const name=url.pathname.slice(5);
-  if(!['checkout','order-status','payment-callback'].includes(name)){res.writeHead(404).end();return}
+  if(!['checkout','order-status','payment-callback','report-payment','admin-payment'].includes(name)){res.writeHead(404).end();return}
   let raw='';for await(const part of req){raw+=part;if(raw.length>12000){res.writeHead(413).end();return}}
   try{req.body=req.headers['content-type']?.includes('application/json')?JSON.parse(raw||'{}'):raw;res.status=c=>{res.statusCode=c;return res};res.json=d=>{res.setHeader('Content-Type','application/json');res.end(JSON.stringify(d))};await(await import('../api/'+name+'.js')).default(req,res)}catch{res.writeHead(500).end()}
   return;

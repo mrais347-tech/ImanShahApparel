@@ -16,6 +16,7 @@ try {
  assert.equal(await page.locator('#bagCount').innerText(),'1');
  await page.reload();assert.equal(await page.locator('#bagCount').innerText(),'1');
  await page.locator('#bagButton').click();await page.getByRole('link',{name:'Continue to checkout'}).click();
+ await page.locator('#items .line-item').waitFor({state:'visible'});
  assert.match(await page.locator('#items').innerText(),/Blue/);
  assert.equal(await page.locator('#payButton').isDisabled(),true);
  assert.match(await page.locator('#message').innerText(),/not open yet/);
@@ -27,17 +28,34 @@ try {
  await page.goto('http://localhost:4173/admin.html');assert.equal(await page.getByRole('button',{name:'Sign in',exact:true}).isDisabled(),true);
  // Exercise the complete form with explicitly mocked external services.
  await page.route('**/shop-config.js',r=>r.fulfill({contentType:'text/javascript',body:"window.SHOP_CONFIG={supabaseUrl:'https://db.test',publishableKey:'public-test',turnstileSiteKey:'test'}"}));
- await page.route('https://db.test/rest/v1/rpc/shop_catalog',r=>r.fulfill({json:{ready:true,shipping_sen:800,variants:[{id:'barrel-slate',price_sen:8900,available:5}]}}));
+ await page.route('https://db.test/rest/v1/rpc/shop_catalog',r=>r.fulfill({json:{ready:true,shipping_sen:1000,variants:[{id:'barrel-slate',price_sen:8900,available:5}]}}));
  await page.route('https://challenges.cloudflare.com/**',r=>r.fulfill({contentType:'text/javascript',body:"window.turnstile={render:(el,o)=>{setTimeout(()=>o.callback('test-proof'),0);return 1},reset:()=>{}};window.onCheckoutCaptcha()"}));
  let sent;
- await page.route('**/api/checkout',async r=>{sent=r.request().postDataJSON();await r.fulfill({json:{reference:'IS-TEST',total_sen:9700,payment_url:'https://dev.toyyibpay.com/testbill'}})});
- await page.route('https://dev.toyyibpay.com/testbill',r=>r.fulfill({contentType:'text/html',body:'<h1>Mock payment destination</h1>'}));
+ await page.route('**/api/checkout',async r=>{sent=r.request().postDataJSON();await r.fulfill({json:{reference:'IS-TEST',total_sen:9900,order_url:'/order.html'}})});
+ let reported=false,confirmed=false,adminRequest;
+ const orderState=()=>({reference:'IS-TEST',status:confirmed?'paid':'pending',total_sen:9900,expires_at:new Date(Date.now()+3600000).toISOString(),payment_method:'bank_transfer',payment_reported_at:reported?new Date().toISOString():null,bank_details:{name:'Test Merchant',bank:'Test Bank',account:'00000000001'}});
+ await page.route('**/api/order-status',r=>r.fulfill({json:orderState()}));
+ await page.route('**/api/report-payment',r=>{reported=true;return r.fulfill({json:{reported:true}})});
+
  await page.evaluate(()=>{localStorage.setItem('iman-bag',JSON.stringify([{id:'barrel-slate',qty:1,size:'Free Size'}]));sessionStorage.removeItem('iman-order-token')});
  await page.goto('http://localhost:4173/checkout.html');
  for(const [name,value] of Object.entries({name:'Test Customer',email:'test@example.com',phone:'60123456789',address:'123 Test Street',postcode:'50000',city:'Kuala Lumpur'}))await page.locator(`[name="${name}"]`).fill(value);
  await page.locator('[name="state"]').selectOption('Kuala Lumpur');await page.getByRole('checkbox').check();
- await page.locator('#payButton').click();await page.waitForURL('https://dev.toyyibpay.com/testbill');
+ await page.locator('#payButton').click();await page.waitForURL('**/order.html');
+ await page.locator('#bankAccount').waitFor({state:'visible'});assert.equal(await page.locator('#bankAccount').innerText(),'00000000001');assert.equal(await page.locator('#bankTotal').innerText(),'RM 99.00');
+ await page.screenshot({path:'test-results/bank-instructions-mobile.png',fullPage:true});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ page.once('dialog',d=>d.accept());await page.locator('#reportPayment').click();await page.waitForFunction(()=>document.querySelector('#heading').textContent==='Awaiting payment verification.');
+ assert.equal(await page.locator('#reportPayment').isDisabled(),true);
  assert.equal(sent.customer.name,'Test Customer');assert.equal(sent.customer.country,'MY');assert.equal(sent.captcha,'test-proof');assert.deepEqual(sent.items,[{variant_id:'barrel-slate',quantity:1}]);
+ const orderId='11111111-1111-4111-8111-111111111111';
+ await page.route('https://db.test/auth/v1/token?grant_type=password',r=>r.fulfill({json:{access_token:'test-admin-token'}}));
+ await page.route('https://db.test/rest/v1/rpc/admin_dashboard',r=>r.fulfill({json:{settings:{whatsapp:'',shipping_sen:1000,launch_at:'2026-10-02T12:00:00Z',orders_open:false},variants:[{id:'barrel-slate',color:'Blue',size:'Free Size',price_sen:8900,stock:7,active:true}],orders:[{...orderState(),id:orderId,customer_name:'Test Customer',phone:'60123456789',email:'test@example.com',address:'Test address',created_at:new Date().toISOString(),subtotal_sen:8900,shipping_sen:1000,items:[{color:'Blue',size:'Free Size',quantity:1,unit_price_sen:8900}],emails:{pending:'sent'}}]}}));
+ await page.route('**/api/admin-payment',r=>{adminRequest=r.request().postDataJSON();confirmed=true;return r.fulfill({json:{status:'paid',email:'not_configured'}})});
+ await page.goto('http://localhost:4173/admin.html');await page.locator('[name="email"]').fill('admin@example.com');await page.locator('[name="password"]').fill('test-password');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.locator('[data-confirm-bank]').waitFor({state:'visible'});
+ const answers=['','HLB-TEST-001','99.00'];const answer=d=>d.accept(answers.shift());page.on('dialog',answer);await page.locator('[data-confirm-bank]').click();await page.getByRole('button',{name:'Mark shipped'}).waitFor({state:'visible'});page.off('dialog',answer);
+ assert.equal(adminRequest.amount_sen,9900);assert.equal(adminRequest.bank_reference,'HLB-TEST-001');assert.equal(adminRequest.action,'confirm');
+ await page.screenshot({path:'test-results/admin-mobile.png',fullPage:true});
  assert.deepEqual(errors,[]);
- console.log('Browser checks passed: persistent bag, checkout navigation, mobile width, empty bag, unavailable payment, untrusted redirect, admin configuration gate, complete form and payment handoff with mocked services; no page errors.');
+ console.log('Browser checks passed: persistent bag, checkout navigation, mobile width, empty bag, unavailable payment, untrusted redirect, admin configuration gate, complete bank checkout, payment report, and admin verification with mocked services; no page errors.');
 } finally {await browser?.close();server.kill();}

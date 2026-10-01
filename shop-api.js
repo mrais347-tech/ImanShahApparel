@@ -10,6 +10,7 @@ const ShopAPI = (()=>{
   const data=await response.json();if(!response.ok)throw Error(data.message||data.error_description||data.error||'Request failed');return data;
  }
  return {configured,config:c,rpc:(name,args={},auth=false)=>request('/rest/v1/rpc/'+name,args,auth),
+  async adminPayment(body){if(!accessToken)throw Error('Please sign in.');const r=await fetch('/api/admin-payment',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+accessToken},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;},
   async login(email,password){const d=await request('/auth/v1/token?grant_type=password',{email,password});accessToken=d.access_token;try{await request('/rest/v1/rpc/admin_dashboard',{},true);}catch(e){accessToken='';throw e;}},
   async logout(){try{if(accessToken)await request('/auth/v1/logout',{},true);}catch{}finally{accessToken='';}}
  };

@@ -30,7 +30,7 @@ async function init(){
 }
 $('#checkoutForm').onsubmit=async e=>{
  e.preventDefault();if($('#payButton').disabled||busy)return;
- busy=true;$('#fields').disabled=true;render();tell('Reserving your items and opening payment…');
+ busy=true;$('#fields').disabled=true;render();tell('Reserving your items…');
  try{
   const customer=Object.fromEntries(new FormData(e.target));
   // Disabled fieldsets are omitted by FormData, so read named controls explicitly.
@@ -38,11 +38,8 @@ $('#checkoutForm').onsubmit=async e=>{
   if(!requestId){requestId=crypto.randomUUID();sessionStorage.setItem('iman-order-token',requestId)}
   submitted=true;
   const response=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:requestId,customer,items:bag.map(i=>({variant_id:i.id,quantity:i.qty})),captcha})});
-  const data=await response.json();if(!response.ok){if(data.reset_request){requestId='';submitted=false;sessionStorage.removeItem('iman-order-token')}throw Error(data.error||'Unable to open payment.');}
-  const url=new URL(data.payment_url);if(!['https://toyyibpay.com','https://dev.toyyibpay.com'].includes(url.origin))throw Error('Invalid payment destination');
-  const shown=bag.reduce((n,i)=>n+live.variants.find(v=>v.id===i.id).price_sen*i.qty,0)+live.shipping_sen;
-  if(shown!==data.total_sen&&!confirm('The current total is '+rm(data.total_sen)+'. Continue to payment at this amount?'))throw Error('Payment paused. Your reservation is saved; check your order or retry to continue.');
-  location.assign(url.href);
+  const data=await response.json();if(!response.ok){if(data.reset_request){requestId='';submitted=false;sessionStorage.removeItem('iman-order-token')}throw Error(data.error||'Unable to create your order.');}
+  location.assign('/order.html');
  }catch(err){tell(err.message);busy=false;$('#fields').disabled=false;captcha='';if(widget!==null)turnstile.reset(widget);render()}
 };
 init();

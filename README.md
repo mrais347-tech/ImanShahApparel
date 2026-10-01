@@ -1,10 +1,10 @@
 # ImanShahApparel
 
-Pelikat-inspired trousers: Black, Maroon and Blue, RM89, Free Size.
+Pelikat-inspired trousers: Black, Maroon and Blue, RM89, Free Size. Opening stock: 3 Black, 7 Maroon, 7 Blue. Shipping: RM10 per order throughout Malaysia.
 
-The existing landing page is paired with guest checkout, a Supabase inventory/order database, an allowlisted admin dashboard and toyyibPay FPX integration. Payment remains disabled until the merchant account, database, stock and delivery are configured.
+The existing landing page is paired with a persistent bag, guest bank-transfer checkout, Supabase inventory/orders and an allowlisted admin dashboard. Customers report payment on their order page; an admin verifies the bank transfer before stock is deducted and payment is confirmed. Optional Gmail messages cover order receipt and payment confirmation.
 
-See [BACKEND-SETUP.md](BACKEND-SETUP.md) for setup, environment variables, launch checks and recovery procedures.
+See [BACKEND-SETUP.md](BACKEND-SETUP.md) for configuration and launch checks. Database and email credentials are not included; orders remain closed until configured and tested.
 
 ```sh
 npm ci
@@ -13,13 +13,13 @@ npm run build
 npm run dev
 ```
 
-Local preview: http://localhost:4173. Deploy using Vercel's Other preset, build command `npm run build`, output directory `public`. Keep `api/` at the repository root so Vercel creates the server functions.
+Preview at http://localhost:4173. Vercel: Other preset, build `npm run build`, output `public`, API functions in root `api/`.
 
-- `/` — existing landing page, product gallery and persistent bag
-- `/checkout.html` — Malaysian delivery details, order summary and FPX handoff
-- `/order.html` — verified payment status and shipment tracking
-- `/admin.html` — admin login, latest 200 orders, inventory and launch settings
+- `/` — landing page, gallery and bag
+- `/checkout.html` — Malaysian delivery details and order summary
+- `/order.html` — bank instructions, payment reporting and verified status
+- `/admin.html` — orders, manual verification, inventory, email retries and tracking
 
-The landing countdown and seeded database launch are October 2, 2026, 8 PM Malaysia time. The countdown does not itself open payments.
+Launch: October 2, 2026, 8 PM Malaysia time. The countdown does not itself enable ordering.
 
-Server code, SQL migrations and environment files are excluded from the public build. Only public connection keys belong in `shop-config.js`.
+Only public connection keys belong in `shop-config.js`. Server code, SQL and environment files are excluded from public output. No toyyibPay account is required for new orders.

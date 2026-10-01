@@ -7,7 +7,7 @@ export default async function handler(req,res) {
     if(!uuid(b.request_id)) return reply(res,400,{error:'Invalid order token'});
     let status=await rpc('checkout_status',{p_request:b.request_id});
     if(!status) return reply(res,404,{error:'No order found yet.'});
-    if(status.bill_code && ['pending','expired'].includes(status.status)) {
+    if(status.payment_method==='toyyibpay' && status.bill_code && ['pending','expired'].includes(status.status)) {
       const order=await rpc('payment_order',{p_reference:status.reference});
       try { await reconcile(order); } catch { /* Keep pending; never infer success from a redirect. */ }
       status=await rpc('checkout_status',{p_request:b.request_id});
