@@ -1,0 +1,43 @@
+import {chromium} from 'playwright';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdir} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const server=spawn(process.execPath,['scripts/dev.js'],{stdio:['ignore','pipe','inherit']});
+await once(server.stdout,'data');
+let browser;
+try {
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox','--disable-gpu']});
+ const page=await browser.newPage({viewport:{width:1440,height:1050}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.route('https://www.tiktok.com/**',r=>r.abort());
+ await page.goto('http://localhost:4173/');
+ await page.locator('#heroPhoto').click();await page.locator('#addButton').click();
+ assert.equal(await page.locator('#bagCount').innerText(),'1');
+ await page.reload();assert.equal(await page.locator('#bagCount').innerText(),'1');
+ await page.locator('#bagButton').click();await page.getByRole('link',{name:'Continue to checkout'}).click();
+ assert.match(await page.locator('#items').innerText(),/Blue/);
+ assert.equal(await page.locator('#payButton').isDisabled(),true);
+ assert.match(await page.locator('#message').innerText(),/not open yet/);
+ await mkdir('test-results',{recursive:true});await page.screenshot({path:'test-results/checkout-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:'test-results/checkout-mobile.png',fullPage:true});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await page.getByRole('button',{name:'Remove'}).click();assert.match(await page.locator('#items').innerText(),/empty/);
+ await page.goto('http://localhost:4173/order.html?status_id=1');assert.doesNotMatch(await page.locator('#heading').innerText(),/It’s yours/);
+ await page.goto('http://localhost:4173/admin.html');assert.equal(await page.getByRole('button',{name:'Sign in',exact:true}).isDisabled(),true);
+ // Exercise the complete form with explicitly mocked external services.
+ await page.route('**/shop-config.js',r=>r.fulfill({contentType:'text/javascript',body:"window.SHOP_CONFIG={supabaseUrl:'https://db.test',publishableKey:'public-test',turnstileSiteKey:'test'}"}));
+ await page.route('https://db.test/rest/v1/rpc/shop_catalog',r=>r.fulfill({json:{ready:true,shipping_sen:800,variants:[{id:'barrel-slate',price_sen:8900,available:5}]}}));
+ await page.route('https://challenges.cloudflare.com/**',r=>r.fulfill({contentType:'text/javascript',body:"window.turnstile={render:(el,o)=>{setTimeout(()=>o.callback('test-proof'),0);return 1},reset:()=>{}};window.onCheckoutCaptcha()"}));
+ let sent;
+ await page.route('**/api/checkout',async r=>{sent=r.request().postDataJSON();await r.fulfill({json:{reference:'IS-TEST',total_sen:9700,payment_url:'https://dev.toyyibpay.com/testbill'}})});
+ await page.route('https://dev.toyyibpay.com/testbill',r=>r.fulfill({contentType:'text/html',body:'<h1>Mock payment destination</h1>'}));
+ await page.evaluate(()=>{localStorage.setItem('iman-bag',JSON.stringify([{id:'barrel-slate',qty:1,size:'Free Size'}]));sessionStorage.removeItem('iman-order-token')});
+ await page.goto('http://localhost:4173/checkout.html');
+ for(const [name,value] of Object.entries({name:'Test Customer',email:'test@example.com',phone:'60123456789',address:'123 Test Street',postcode:'50000',city:'Kuala Lumpur'}))await page.locator(`[name="${name}"]`).fill(value);
+ await page.locator('[name="state"]').selectOption('Kuala Lumpur');await page.getByRole('checkbox').check();
+ await page.locator('#payButton').click();await page.waitForURL('https://dev.toyyibpay.com/testbill');
+ assert.equal(sent.customer.name,'Test Customer');assert.equal(sent.customer.country,'MY');assert.equal(sent.captcha,'test-proof');assert.deepEqual(sent.items,[{variant_id:'barrel-slate',quantity:1}]);
+ assert.deepEqual(errors,[]);
+ console.log('Browser checks passed: persistent bag, checkout navigation, mobile width, empty bag, unavailable payment, untrusted redirect, admin configuration gate, complete form and payment handoff with mocked services; no page errors.');
+} finally {await browser?.close();server.kill();}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Checkout — ImanShahApparel</title><link rel="stylesheet" href="checkout.css"></head>
+<body><header><a class="brand" href="/"><img src="assets/logo-transparent.png" alt="ImanShahApparel"></a><a href="/#collection">← Back to the collection</a></header>
+<main><div class="intro"><p class="eyebrow">THE FIRST DROP / CHECKOUT</p><h1>Make yourself<br>comfortable.</h1><p>Your everyday fit. Just a few details to make it yours.</p></div>
+<div class="checkout-layout"><section class="details"><form id="checkoutForm"><fieldset id="fields"><legend>01 / Contact & delivery</legend><div class="form-grid">
+<label class="wide">Full name<input name="name" autocomplete="name" minlength="2" maxlength="100" required></label>
+<label>Email<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+<label>Phone number<input name="phone" type="tel" autocomplete="tel" placeholder="60123456789" pattern="\+?[0-9]{8,15}" required></label>
+<label class="wide">Street address<input name="address" autocomplete="street-address" minlength="10" maxlength="350" required></label>
+<label>Postcode<input name="postcode" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" maxlength="5" required></label>
+<label>City<input name="city" autocomplete="address-level2" maxlength="80" required></label>
+<label>State<select name="state" autocomplete="address-level1" required><option value="">Select state</option><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Kuala Lumpur</option><option>Labuan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Penang</option><option>Perak</option><option>Perlis</option><option>Putrajaya</option><option>Sabah</option><option>Sarawak</option><option>Selangor</option><option>Terengganu</option></select></label>
+<label>Country<input value="Malaysia" readonly><input type="hidden" name="country" value="MY"></label></div>
+<h2>02 / Payment</h2><div class="payment-method"><span>Online banking</span><strong>FPX · toyyibPay</strong></div><p class="note">Continue to toyyibPay to choose your bank. Your order is confirmed after payment verification.</p>
+<label class="consent"><input type="checkbox" required><span>I confirm my delivery details are correct and allow the store to use them to process and deliver this order.</span></label>
+<div id="captcha"></div><button id="payButton" class="primary" disabled>Continue to payment ↗</button></fieldset><p id="message" role="status" aria-live="polite">Checking the store…</p><p class="note">Need a hand? <a href="https://www.tiktok.com/@imanshahapparel" target="_blank" rel="noopener">Contact ImanShahApparel</a>.</p><a id="checkOrder" href="order.html" hidden>Check your existing order →</a></form></section>
+<aside class="summary"><p class="eyebrow">YOUR BAG</p><h2>A little everyday ease.</h2><div id="items"></div><dl><div><dt>Subtotal</dt><dd id="subtotal">—</dd></div><div><dt>Delivery</dt><dd id="shipping">Confirmed at checkout</dd></div><div class="grand-total"><dt>Total</dt><dd id="total">—</dd></div></dl><p class="note">All amounts in Malaysian Ringgit. Items in your bag are not reserved until checkout is submitted.</p></aside></div></main>
+<footer>IMANSHAHAPPAREL <span>Free & easy. Put together.</span></footer>
+<script src="shop-config.js"></script><script src="shop-api.js"></script><script src="checkout.js"></script></body></html>
