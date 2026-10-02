@@ -25,6 +25,7 @@ export async function rpc(name, body) {
     method:'POST', headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},
     body:JSON.stringify(body), signal:AbortSignal.timeout(10000)
   });
+  if(response.ok && response.status===204) return null;
   const data=await response.json();
   if(!response.ok) throw Object.assign(Error('Database request failed'),{database:data.message});
   return data;
