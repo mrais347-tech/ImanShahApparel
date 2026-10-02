@@ -1,24 +1,25 @@
 # ImanShahApparel
 
-Static storefront preview. No installation or build step is required.
+Pelikat-inspired trousers: Black, Maroon and Blue, RM89, Free Size. Opening stock: 3 Black, 7 Maroon, 7 Blue. Shipping: RM10 per order throughout Malaysia.
 
-## Deploy
+The existing landing page is paired with a persistent bag, guest bank-transfer checkout, Supabase inventory/orders and an allowlisted admin dashboard. Customers report payment on their order page; an admin verifies the bank transfer before stock is deducted and payment is confirmed. Optional Gmail messages cover order receipt and payment confirmation.
 
-Extract this ZIP and put its contents at the root of your Git repository (index.html should be at the root). Commit and push, then import that repository into Vercel. Use the Other framework preset and the repository root. The included vercel.json serves the root directory without a build step.
+See [BACKEND-SETUP.md](BACKEND-SETUP.md) for configuration and launch checks. Database and email credentials are not included; orders remain closed until configured and tested.
 
-If updating an existing project, use the existing repository and preserve its .git directory. Check any existing project build/output overrides before deploying.
+```sh
+npm ci
+npm test
+npm run build
+npm run dev
+```
 
-## Edit
+Preview at http://localhost:4173. Vercel: Other preset, build `npm run build`, output `public`, API functions in root `api/`.
 
-- index.html: page structure and copy
-- style.css: visual styling and responsive layouts
-- app.js: products, galleries, demo bag, colour switching and countdown
-- assets/: supplied product posters and original product photos
+- `/` — landing page, gallery and bag
+- `/checkout.html` — Malaysian delivery details and order summary
+- `/order.html` — bank instructions, payment reporting and verified status
+- `/admin.html` — orders, manual verification, inventory, email retries and tracking
 
-The launch target is 2026-10-02T20:00:00+08:00 (October 2, 2026, 8pm Malaysia time), configured as dropAt in app.js. After the countdown ends, it stays at zero and shows a check-back message; it does not automatically enable purchasing.
+Launch: October 2, 2026, 8 PM Malaysia time. The countdown does not itself enable ordering.
 
-## Current limitations
-
-Checkout and payments are disabled. All three colourways (Black, Maroon and Blue) are RM89 per pair. All trousers are Free Size; no size selection is required. The demo bag resets on reload. TikTok playback depends on TikTok availability and browser restrictions. Generated campaign posters are used alongside original product photographs.
-
-This archive contains the current v8 storefront exported from source commit b5fda804aaadfff0e644343286cbe980eb2ce45e. It excludes repository history, credentials, and Sites hosting metadata.
+Only public connection keys belong in `shop-config.js`. Server code, SQL and environment files are excluded from public output. No toyyibPay account is required for new orders.

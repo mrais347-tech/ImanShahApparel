@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "playwright": "^1.58.2"
+  },
+  "name": "imanshahapparel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node --test tests/*.test.js",
+    "dev": "node scripts/dev.js"
+  },
+  "dependencies": {
+    "nodemailer": "^7.0.13"
+  }
+}
